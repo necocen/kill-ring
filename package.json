@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "description": "A short description of your package",
   "activationCommands": {
-    "atom-workspace": "kill-ring:toggle"
+    "atom-workspace": "kill-ring:set-mark"
   },
   "repository": "https://github.com/atom/kill-ring",
   "license": "MIT",
