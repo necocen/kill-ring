@@ -1,12 +1,12 @@
 {
   "name": "kill-ring",
   "main": "./lib/kill-ring",
-  "version": "0.0.0",
-  "description": "A short description of your package",
+  "version": "0.0.1",
+  "description": "An emacs-like kill ring.",
   "activationCommands": {
     "atom-workspace": "kill-ring:set-mark"
   },
-  "repository": "https://github.com/atom/kill-ring",
+  "repository": "https://github.com/necocen/kill-ring",
   "license": "MIT",
   "engines": {
     "atom": ">0.50.0"
