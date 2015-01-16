@@ -1,8 +1,9 @@
-{CompositeDisposable} = require 'atom'
+{Point, Range, CompositeDisposable} = require 'atom'
 
 module.exports = KillRing =
   subscriptions: null
   killRing: null
+  lastYankRange: null
 
   activate: (state) ->
 
@@ -19,8 +20,6 @@ module.exports = KillRing =
     @subscriptions.add atom.commands.add 'atom-text-editor', 'kill-ring:kill-line': => @killLine()
     @subscriptions.add atom.commands.add 'atom-text-editor', 'kill-ring:yank': => @yank()
     @subscriptions.add atom.commands.add 'atom-text-editor', 'kill-ring:yank-pop': => @yankPop()
-    @subscriptions.add atom.commands.onWillDispatch (event) -> console.log(event.type)
-    # cursor:movedを見て状況判断できそう
 
   deactivate: ->
     @subscriptions.dispose()
@@ -29,27 +28,50 @@ module.exports = KillRing =
     console.log 'KR: set-mark'
 
   killSelection: ->
-    console.log 'KR: kill-selection'
+    editor = atom.workspace.getActiveTextEditor()
+    return if editor is null
+    selection = editor.getLastSelection()
+    return if selection is null
+    range = selection.getBufferRange()
+    text = editor.getTextInRange(range)
+    return if text.length is 0
+    @killRing.push(text)
+    editor.buffer.delete(range)
 
   killLine: ->
     editor = atom.workspace.getActiveTextEditor()
     return if editor is null
+    cursor = editor.getCursors()[0]
+    return if cursor is null
     editor.transact =>
-      selection = editor.getSelections()[0]
-      return if selection is null
-      selection.selectToEndOfLine() if selection.isEmpty()
-      {start, end} = selection.getBufferRange()
-      selectionText = editor.getTextInRange([start, end])
-      @killRing.push(selectionText)
-      selection.delete()
-      console.log 'KR: kill-line'
+      range = new Range(cursor.getBufferPosition(), new Point(cursor.getBufferRow(), Infinity))
+      text = editor.getTextInRange(range)
+      if text.length is 0 # remove \n if the cursor is on end-of-line
+        range = new Range(cursor.getBufferPosition(), new Point(cursor.getBufferRow() + 1, 0))
+        text = editor.getTextInRange(range)
+      return if text.length is 0
+      @killRing.push(text)
+      editor.buffer.delete(range)
 
   yank: ->
-    atom.workspace.getActiveTextEditor()?.insertText @killRing.peek()
-    console.log 'KR: yanked'
+    console.log @lastYankRange
+    editor = atom.workspace.getActiveTextEditor()
+    return if editor is null
+    cursor = editor.getCursors()[0]
+    return if cursor is null
+    @lastYankRange = editor.setTextInBufferRange(new Range(cursor.getBufferPosition(), cursor.getBufferPosition()), @killRing.peek())
+    subscription = editor.onDidChangeCursorPosition (event) =>
+      @lastYankRange = null
+      subscription.dispose()
 
   yankPop: ->
-    console.log 'KR: yank-pop'
+    return if @lastYankRange is null # last command is not yank
+    editor = atom.workspace.getActiveTextEditor()
+    return if editor is null
+    @lastYankRange = editor.setTextInBufferRange(@lastYankRange, @killRing.peekback())
+    subscription = editor.onDidChangeCursorPosition (event) =>
+      @lastYankRange = null
+      subscription.dispose()
 
 class KillRing
 
