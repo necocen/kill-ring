@@ -15,20 +15,20 @@ module.exports = KillRing =
     @buffer = new RingBuffer([], 4)
 
     # Register command that toggles this view
-    @subscriptions.add atom.commands.add 'atom-text-editor', 'kill-ring:set-mark': => @setMark()
-    @subscriptions.add atom.commands.add 'atom-text-editor', 'kill-ring:kill-selection': => @killSelection()
-    @subscriptions.add atom.commands.add 'atom-text-editor', 'kill-ring:kill-line': => @killLine()
-    @subscriptions.add atom.commands.add 'atom-text-editor', 'kill-ring:yank': => @yank()
-    @subscriptions.add atom.commands.add 'atom-text-editor', 'kill-ring:yank-pop': => @yankPop()
+    @subscriptions.add atom.commands.add 'atom-text-editor', 'kill-ring:set-mark': (event) => @setMark(event)
+    @subscriptions.add atom.commands.add 'atom-text-editor', 'kill-ring:kill-selection': (event) => @killSelection(event)
+    @subscriptions.add atom.commands.add 'atom-text-editor', 'kill-ring:kill-line': (event) => @killLine(event)
+    @subscriptions.add atom.commands.add 'atom-text-editor', 'kill-ring:yank': (event) => @yank(event)
+    @subscriptions.add atom.commands.add 'atom-text-editor', 'kill-ring:yank-pop': (event) => @yankPop(event)
 
   deactivate: ->
     @subscriptions.dispose()
 
-  setMark: ->
+  setMark: (event) ->
     console.log 'KR: set-mark'
 
-  killSelection: ->
-    editor = atom.workspace.getActiveTextEditor()
+  killSelection: (event) ->
+    editor = event.target.model
     return if editor is null
     selection = editor.getLastSelection()
     return if selection is null
@@ -38,8 +38,8 @@ module.exports = KillRing =
     @buffer.push(text)
     editor.buffer.delete(range)
 
-  killLine: ->
-    editor = atom.workspace.getActiveTextEditor()
+  killLine: (event) ->
+    editor = event.target.model
     return if editor is null
     cursor = editor.getLastCursor()
     return if cursor is null
@@ -53,8 +53,8 @@ module.exports = KillRing =
       @buffer.push(text)
       editor.buffer.delete(range)
 
-  yank: ->
-    editor = atom.workspace.getActiveTextEditor()
+  yank: (event) ->
+    editor = event.target.model
     return if editor is null
     cursor = editor.getLastCursor()
     return if cursor is null
@@ -63,9 +63,9 @@ module.exports = KillRing =
       @lastYankRange = null
       subscription.dispose()
 
-  yankPop: ->
+  yankPop: (event) ->
     return if @lastYankRange is null # last command is not yank
-    editor = atom.workspace.getActiveTextEditor()
+    editor = event.target.model
     return if editor is null
     @lastYankRange = editor.setTextInBufferRange(@lastYankRange, @buffer.peekback())
     subscription = editor.onDidChangeCursorPosition (event) =>
