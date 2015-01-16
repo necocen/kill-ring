@@ -60,8 +60,9 @@ module.exports = KillRing =
       range = new Range(markerPosition, cursorPosition)
     text = editor.getTextInRange(range)
     return if text.length is 0
-    @buffer.push(text)
-    editor.buffer.delete(range)
+    editor.transact =>
+      @buffer.push(text)
+      editor.buffer.delete(range)
 
   killSelection: (event) ->
     editor = event.target.model
@@ -71,8 +72,9 @@ module.exports = KillRing =
     range = selection.getBufferRange()
     text = editor.getTextInRange(range)
     return if text.length is 0
-    @buffer.push(text)
-    editor.buffer.delete(range)
+    editor.transact =>
+      @buffer.push(text)
+      editor.buffer.delete(range)
 
   killLine: (event) ->
     editor = event.target.model
