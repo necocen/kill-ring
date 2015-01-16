@@ -3,6 +3,15 @@
 // See https://github.com/atom/atom-dark-ui/blob/master/stylesheets/ui-variables.less
 // for a full listing of what's available.
 @import "ui-variables";
+@import "octicon-utf-codes.less";
 
-.kill-ring {
+atom-text-editor::shadow {
+	.kill-ring-marked .icon-right {
+		visibility: visible;
+		&:before {
+			content: @primitive-dot;
+			color: @text-color-highlight;
+			font-size: large;
+		}
+	}
 }
