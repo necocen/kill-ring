@@ -29,9 +29,9 @@ module.exports = KillRing =
 
   killSelection: (event) ->
     editor = event.target.model
-    return if editor is null
+    return unless editor?
     selection = editor.getLastSelection()
-    return if selection is null
+    return unless selection?
     range = selection.getBufferRange()
     text = editor.getTextInRange(range)
     return if text.length is 0
@@ -40,9 +40,9 @@ module.exports = KillRing =
 
   killLine: (event) ->
     editor = event.target.model
-    return if editor is null
+    return unless editor?
     cursor = editor.getLastCursor()
-    return if cursor is null
+    return unless cursor?
     editor.transact =>
       range = new Range(cursor.getBufferPosition(), new Point(cursor.getBufferRow(), Infinity))
       text = editor.getTextInRange(range)
@@ -55,9 +55,9 @@ module.exports = KillRing =
 
   yank: (event) ->
     editor = event.target.model
-    return if editor is null
+    return unless editor?
     cursor = editor.getLastCursor()
-    return if cursor is null
+    return unless cursor?
     @lastYankRange = editor.setTextInBufferRange(new Range(cursor.getBufferPosition(), cursor.getBufferPosition()), @buffer.peek())
     subscription = editor.onDidChangeCursorPosition (event) =>
       @lastYankRange = null
@@ -66,7 +66,7 @@ module.exports = KillRing =
   yankPop: (event) ->
     return if @lastYankRange is null # last command is not yank
     editor = event.target.model
-    return if editor is null
+    return unless editor?
     @lastYankRange = editor.setTextInBufferRange(@lastYankRange, @buffer.peekback())
     subscription = editor.onDidChangeCursorPosition (event) =>
       @lastYankRange = null
