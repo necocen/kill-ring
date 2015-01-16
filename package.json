@@ -4,7 +4,13 @@
   "version": "0.0.1",
   "description": "An emacs-like kill ring.",
   "activationCommands": {
-    "atom-workspace": "kill-ring:set-mark"
+    "atom-workspace": [
+      "kill-ring:set-mark",
+      "kill-ring:kill-selection",
+      "kill-ring:kill-line",
+      "kill-ring:yank",
+      "kill-ring:yank-pop"
+    ]
   },
   "repository": "https://github.com/necocen/kill-ring",
   "license": "MIT",

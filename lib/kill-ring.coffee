@@ -11,7 +11,6 @@ module.exports = KillRing =
     @subscriptions = new CompositeDisposable
 
     # setup kill-ring
-    console.log 'KR: activate'
     @killRing = new KillRing([], 4)
 
     # Register command that toggles this view

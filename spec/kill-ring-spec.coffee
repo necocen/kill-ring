@@ -1,4 +1,5 @@
 KillRing = require '../lib/kill-ring'
+path = require 'path'
 
 # Use the command `window:run-package-specs` (cmd-alt-ctrl-p) to run specs.
 #
@@ -6,25 +7,23 @@ KillRing = require '../lib/kill-ring'
 # or `fdescribe`). Remove the `f` to unfocus the block.
 
 describe "KillRing", ->
-  [activationPromise] = []
+  [editor, editorView, activationPromise] = []
 
   beforeEach ->
+    expect(atom.packages.isPackageActive('kill-ring')).toBe false
+    atom.project.setPaths([path.join(__dirname, 'fixtures')])
+    waitsForPromise ->
+      atom.workspace.open('1.txt')
 
-  describe "kill-ring", ->
-    it "saves killed text", ->
-      expect(1).toEqual(1)
-      expect(2).toEqual(2)
-      KillRing.killRing.push("12345")
-      expect(KillRing.killRing.peek()).toEqual("12345")
+    runs ->
+      editor = atom.workspace.getActiveTextEditor()
+      editorView = atom.views.getView(editor)
+      activationPromise = atom.packages.activatePackage('kill-ring')
+      activationPromise.fail (reason) ->
+        throw reason
 
-
-#      waitsForPromise ->
-#        atom.workspace.open()
-      #waitsForPromise ->
-      #  atom.packages.activatePackage('kill-ring')
-
-#      runs ->
-#        console.log 'nekoneko'
-#        expect(1).toEqual(1)
-#        #KillRing.killRing.push("12345")
-#        #expect(KillRing.killRing.peek()).toEqual("12345")
+  describe "kill-line", ->
+    it "should kill line", ->
+      editor.setCursorBufferPosition [0, 0]
+      atom.commands.dispatch editorView, 'kill-ring:kill-line'
+      expect(editor.getText()).toEqual('\nabcdefghij\nABCDEFGHIJ\n9876543210\nzyxwvutsrq\nZYXWVUTSRQ')
