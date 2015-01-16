@@ -4,7 +4,7 @@
   "version": "0.0.1",
   "description": "An emacs-like kill ring.",
   "activationCommands": {
-    "atom-workspace": [
+    "atom-text-editor": [
       "kill-ring:set-mark",
       "kill-ring:kill-selection",
       "kill-ring:kill-line",
