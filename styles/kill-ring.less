@@ -6,11 +6,15 @@
 @import "octicon-utf-codes.less";
 
 atom-text-editor::shadow {
+	.line-number.kill-ring-marked {
+		opacity: 1;
+	}
 	.kill-ring-marked .icon-right {
 		visibility: visible;
+		opacity: 1;
 		&:before {
 			content: @primitive-dot;
-			color: @text-color-highlight;
+			color: @ui-site-color-1;
 			font-size: large;
 		}
 	}
