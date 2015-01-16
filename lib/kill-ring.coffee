@@ -2,7 +2,7 @@
 
 module.exports = KillRing =
   subscriptions: null
-  killRing: null
+  buffer: null
   lastYankRange: null
 
   activate: (state) ->
@@ -12,7 +12,7 @@ module.exports = KillRing =
 
     # setup ring buffer
     RingBuffer = require "./ring-buffer"
-    @killRing = new RingBuffer([], 4)
+    @buffer = new RingBuffer([], 4)
 
     # Register command that toggles this view
     @subscriptions.add atom.commands.add 'atom-text-editor', 'kill-ring:set-mark': => @setMark()
@@ -35,13 +35,13 @@ module.exports = KillRing =
     range = selection.getBufferRange()
     text = editor.getTextInRange(range)
     return if text.length is 0
-    @killRing.push(text)
+    @buffer.push(text)
     editor.buffer.delete(range)
 
   killLine: ->
     editor = atom.workspace.getActiveTextEditor()
     return if editor is null
-    cursor = editor.getCursors()[0]
+    cursor = editor.getLastCursor()
     return if cursor is null
     editor.transact =>
       range = new Range(cursor.getBufferPosition(), new Point(cursor.getBufferRow(), Infinity))
@@ -50,15 +50,15 @@ module.exports = KillRing =
         range = new Range(cursor.getBufferPosition(), new Point(cursor.getBufferRow() + 1, 0))
         text = editor.getTextInRange(range)
       return if text.length is 0
-      @killRing.push(text)
+      @buffer.push(text)
       editor.buffer.delete(range)
 
   yank: ->
     editor = atom.workspace.getActiveTextEditor()
     return if editor is null
-    cursor = editor.getCursors()[0]
+    cursor = editor.getLastCursor()
     return if cursor is null
-    @lastYankRange = editor.setTextInBufferRange(new Range(cursor.getBufferPosition(), cursor.getBufferPosition()), @killRing.peek())
+    @lastYankRange = editor.setTextInBufferRange(new Range(cursor.getBufferPosition(), cursor.getBufferPosition()), @buffer.peek())
     subscription = editor.onDidChangeCursorPosition (event) =>
       @lastYankRange = null
       subscription.dispose()
@@ -67,7 +67,7 @@ module.exports = KillRing =
     return if @lastYankRange is null # last command is not yank
     editor = atom.workspace.getActiveTextEditor()
     return if editor is null
-    @lastYankRange = editor.setTextInBufferRange(@lastYankRange, @killRing.peekback())
+    @lastYankRange = editor.setTextInBufferRange(@lastYankRange, @buffer.peekback())
     subscription = editor.onDidChangeCursorPosition (event) =>
       @lastYankRange = null
       subscription.dispose()
