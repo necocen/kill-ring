@@ -4,6 +4,7 @@ module.exports = KillRing =
   subscriptions: null
   buffer: null
   lastYankRange: null
+  markers: {}
 
   activate: (state) ->
 
@@ -16,6 +17,7 @@ module.exports = KillRing =
 
     # Register command that toggles this view
     @subscriptions.add atom.commands.add 'atom-text-editor', 'kill-ring:set-mark': (event) => @setMark(event)
+    @subscriptions.add atom.commands.add 'atom-text-editor', 'kill-ring:kill-region': (event) => @killRegion(event)
     @subscriptions.add atom.commands.add 'atom-text-editor', 'kill-ring:kill-selection': (event) => @killSelection(event)
     @subscriptions.add atom.commands.add 'atom-text-editor', 'kill-ring:kill-line': (event) => @killLine(event)
     @subscriptions.add atom.commands.add 'atom-text-editor', 'kill-ring:yank': (event) => @yank(event)
@@ -23,9 +25,42 @@ module.exports = KillRing =
 
   deactivate: ->
     @subscriptions.dispose()
+    marker.destroy() for id, marker in @markers
 
   setMark: (event) ->
-    console.log 'KR: set-mark'
+    editor = event.target.model
+    return unless editor?
+    cursor = editor.getLastCursor()
+    return unless cursor?
+
+    marker = @markers[editor.id]
+    unless marker?
+      marker = editor.markBufferPosition cursor.getBufferPosition(), {persistent: false}
+      @markers[editor.id] = marker
+    else
+      marker.setHeadBufferPosition cursor.getBufferPosition()
+
+  killRegion: (event) ->
+    editor = event.target.model
+    return unless editor?
+    cursor = editor.getLastCursor()
+    return unless cursor?
+    marker = @markers[editor.id]
+    return unless marker?
+    return unless marker.isValid()
+
+    cursorPosition = cursor.getBufferPosition()
+    markerPosition = marker.getHeadBufferPosition()
+    return if cursorPosition.isEqual(markerPosition)
+    range = null
+    if cursorPosition.isLessThan(markerPosition)
+      range = new Range(cursorPosition, markerPosition)
+    else
+      range = new Range(markerPosition, cursorPosition)
+    text = editor.getTextInRange(range)
+    return if text.length is 0
+    @buffer.push(text)
+    editor.buffer.delete(range)
 
   killSelection: (event) ->
     editor = event.target.model
