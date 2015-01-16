@@ -53,7 +53,6 @@ module.exports = KillRing =
       editor.buffer.delete(range)
 
   yank: ->
-    console.log @lastYankRange
     editor = atom.workspace.getActiveTextEditor()
     return if editor is null
     cursor = editor.getCursors()[0]
