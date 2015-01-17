@@ -47,7 +47,7 @@ module.exports = KillRing =
     marker = @markers[editor.id]
     unless marker?
       marker = editor.markBufferPosition cursor.getBufferPosition(), {persistent: false}
-      editor.decorateMarker marker, {type: 'gutter', class: 'kill-ring-marked', onlyHead: true}
+      editor.decorateMarker marker, {type: 'line-number', class: 'kill-ring-marked', onlyHead: true}
       @markers[editor.id] = marker
     else
       marker.setHeadBufferPosition cursor.getBufferPosition()
