@@ -58,11 +58,7 @@ module.exports = KillRing =
       range = new Range(cursorPosition, markerPosition)
     else
       range = new Range(markerPosition, cursorPosition)
-    text = editor.getTextInRange(range)
-    return if text.length is 0
-    editor.transact =>
-      @buffer.push(text)
-      editor.buffer.delete(range)
+    @_killRange editor, range, false
 
   killSelection: (event) ->
     editor = event.target.model
@@ -70,26 +66,18 @@ module.exports = KillRing =
     selection = editor.getLastSelection()
     return unless selection?
     range = selection.getBufferRange()
-    text = editor.getTextInRange(range)
-    return if text.length is 0
-    editor.transact =>
-      @buffer.push(text)
-      editor.buffer.delete(range)
+    @_killRange editor, range, false
 
   killLine: (event) ->
     editor = event.target.model
     return unless editor?
     cursor = editor.getLastCursor()
     return unless cursor?
-    editor.transact =>
-      range = new Range(cursor.getBufferPosition(), new Point(cursor.getBufferRow(), Infinity))
-      text = editor.getTextInRange(range)
-      if text.length is 0 # remove \n if the cursor is on end-of-line
-        range = new Range(cursor.getBufferPosition(), new Point(cursor.getBufferRow() + 1, 0))
-        text = editor.getTextInRange(range)
-      return if text.length is 0
-      @buffer.push(text)
-      editor.buffer.delete(range)
+    range = new Range(cursor.getBufferPosition(), new Point(cursor.getBufferRow(), Infinity))
+    text = editor.getTextInRange(range)
+    if text.length is 0 # remove \n if the cursor is on end-of-line
+      range = new Range(cursor.getBufferPosition(), new Point(cursor.getBufferRow() + 1, 0))
+    @_killRange editor, range, false
 
   yank: (event) ->
     editor = event.target.model
@@ -109,3 +97,10 @@ module.exports = KillRing =
     subscription = editor.onDidChangeCursorPosition (event) =>
       @lastYankRange = null
       subscription.dispose()
+
+  _killRange: (editor, range, copy) ->
+    editor.transact =>
+      text = editor.getTextInRange(range)
+      return if text.length is 0
+      @buffer.push(text)
+      editor.buffer.delete(range) if copy is false
