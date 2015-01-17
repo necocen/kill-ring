@@ -1,6 +1,14 @@
 {Point, Range, CompositeDisposable} = require 'atom'
 
 module.exports = KillRing =
+  config:
+    killRingSize:
+      title: "Kill Ring Size"
+      description: 'Number of strings kill-ring can save. If set less than current value, current kill-ring is truncated.'
+      type: 'integer'
+      default: 64
+      minimum: 1
+
   subscriptions: null
   buffer: null
   lastYankRange: null
@@ -13,7 +21,7 @@ module.exports = KillRing =
 
     # setup ring buffer
     RingBuffer = require "./ring-buffer"
-    @buffer = new RingBuffer([], 4)
+    @buffer = new RingBuffer([], atom.config.get 'kill-ring.killRingSize')
 
     # Register command that toggles this view
     @subscriptions.add atom.commands.add 'atom-text-editor', 'kill-ring:set-mark': (event) => @setMark(event)
@@ -24,6 +32,7 @@ module.exports = KillRing =
     @subscriptions.add atom.commands.add 'atom-text-editor', 'kill-ring:yank': (event) => @yank(event)
     @subscriptions.add atom.commands.add 'atom-text-editor', 'kill-ring:yank-pop': (event) => @yankPop(event)
     @subscriptions.add atom.commands.add 'atom-text-editor', 'kill-ring:exchange-point-and-mark': (event) => @exchangePointAndMark(event)
+    @subscriptions.add atom.config.observe 'kill-ring.killRingSize', (newValue) => @buffer.setSize(newValue)
 
   deactivate: ->
     @subscriptions.dispose()
