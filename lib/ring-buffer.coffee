@@ -7,7 +7,7 @@ module.exports = class RingBuffer
     _current = _head
 
     @push = (text) ->
-      if _head >= _size
+      if _head >= (_size - 1)
         _head = 0
       else
         _head += 1
