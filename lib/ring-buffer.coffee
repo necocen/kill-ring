@@ -16,19 +16,19 @@ module.exports = class RingBuffer
 
     @peek = ->
       if _current < 0
-        ""
+        return nil
       else
-        _buffer[_current]
+        return _buffer[_current]
 
     @peekback = ->
       if _current < 0
-        ""
+        return nil
       else if _current is 0
         _current = _buffer.length - 1
-        _buffer[_current]
+        return _buffer[_current]
       else
         _current -= 1
-        _buffer[_current]
+        return _buffer[_current]
 
     normalize = ->
       if (_buffer.length is _size) and (_current > 0)

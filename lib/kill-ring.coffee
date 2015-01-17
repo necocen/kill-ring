@@ -81,7 +81,9 @@ module.exports = KillRing =
     return unless editor?
     cursor = editor.getLastCursor()
     return unless cursor?
-    @lastYankRange = editor.setTextInBufferRange(new Range(cursor.getBufferPosition(), cursor.getBufferPosition()), @buffer.peek())
+    text = @buffer.peek()
+    return unless text?
+    @lastYankRange = editor.setTextInBufferRange(new Range(cursor.getBufferPosition(), cursor.getBufferPosition()), text)
     subscription = editor.onDidChangeCursorPosition (event) =>
       @lastYankRange = null
       subscription.dispose()
@@ -90,7 +92,9 @@ module.exports = KillRing =
     return if @lastYankRange is null # last command is not yank
     editor = event.target.model
     return unless editor?
-    @lastYankRange = editor.setTextInBufferRange(@lastYankRange, @buffer.peekback())
+    text = @buffer.peekback()
+    return unless text?
+    @lastYankRange = editor.setTextInBufferRange(@lastYankRange, text)
     subscription = editor.onDidChangeCursorPosition (event) =>
       @lastYankRange = null
       subscription.dispose()
