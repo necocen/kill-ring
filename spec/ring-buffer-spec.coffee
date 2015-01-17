@@ -55,6 +55,10 @@ describe "RingBuffer", ->
 			expect(buffer.peekback()).toEqual '111'
 
 	describe "setSize", ->
+		it "changes size", ->
+			buffer.setSize 8
+			expect(buffer.getSize()).toEqual 8
+			
 		it "preserves buffer state on expanding", ->
 			buffer.push '111'
 			buffer.push '222'
