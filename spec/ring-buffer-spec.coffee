@@ -74,3 +74,24 @@ describe "RingBuffer", ->
 			expect(buffer.peekback()).toEqual '222'
 			expect(buffer.peekback()).toEqual '333'
 			expect(buffer.peekback()).toEqual '222'
+
+	describe "normalize", ->
+		it "preserves buffer state", ->
+			buffer.push '111'
+			buffer.push '222'
+			buffer.push '333'
+			buffer.normalize()
+			expect(buffer.peek()).toEqual '333'
+			expect(buffer.peekback()).toEqual '222'
+			expect(buffer.peekback()).toEqual '111'
+			expect(buffer.peekback()).toEqual '333'
+
+			buffer.push '444'
+			buffer.push '555'
+			buffer.push '666'
+			buffer.normalize()
+			expect(buffer.peek()).toEqual '666'
+			expect(buffer.peekback()).toEqual '555'
+			expect(buffer.peekback()).toEqual '444'
+			expect(buffer.peekback()).toEqual '333'
+			expect(buffer.peekback()).toEqual '666'
