@@ -8,10 +8,10 @@
 # For more detailed documentation see
 # https://atom.io/docs/latest/advanced/keymaps
 'atom-text-editor':
-  'ctrl-space': 'kill-ring:set-mark'
-  'ctrl-w': 'kill-ring:kill-region'
-  'alt-w': 'kill-ring:copy-region-as-kill'
-  'ctrl-k': 'kill-ring:kill-line'
-  'ctrl-y': 'kill-ring:yank'
-  'alt-y': 'kill-ring:yank-pop'
+  'ctrl-space':    'kill-ring:set-mark'
+  'ctrl-w':        'kill-ring:kill-region'
+  'alt-w':         'kill-ring:copy-region-as-kill'
+  'ctrl-k':        'kill-ring:kill-line'
+  'ctrl-y':        'kill-ring:yank'
+  'alt-y':         'kill-ring:yank-pop'
   'ctrl-x ctrl-x': 'kill-ring:exchange-point-and-mark'
