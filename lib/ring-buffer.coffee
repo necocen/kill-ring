@@ -44,6 +44,8 @@ module.exports = class RingBuffer
     @getSize = -> _size
     @setSize = (newSize) ->
       @normalize()
-      _size = newSize
       if newSize < _buffer.length
         _buffer = _buffer[(_buffer.length - newSize)..]
+        _head = newSize - 1
+      _current = _head
+      _size = newSize
