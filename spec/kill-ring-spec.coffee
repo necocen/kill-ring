@@ -21,28 +21,22 @@ describe "KillRing", ->
 
   describe "kill-line", ->
     it "should kill line", ->
-      atom.commands.dispatch editorView, 'kill-ring:yank'
-      waitsForPromise ->
-        activationPromise
+      editor.setCursorBufferPosition [0, 0]
+      atom.commands.dispatch editorView, 'kill-ring:kill-line'
+      waitsForPromise -> activationPromise
       runs ->
-        editor.setCursorBufferPosition [0, 0]
-        atom.commands.dispatch editorView, 'kill-ring:kill-line'
         expect(editor.getText()).toEqual('\nabcdefghij\nABCDEFGHIJ\n9876543210\nzyxwvutsrq\nZYXWVUTSRQ\n')
 
     it "should remove linebreak when the cursor is on end-of-line", ->
-      atom.commands.dispatch editorView, 'kill-ring:yank'
-      waitsForPromise ->
-        activationPromise
+      editor.setCursorBufferPosition [0, 10]
+      atom.commands.dispatch editorView, 'kill-ring:kill-line'
+      waitsForPromise -> activationPromise
       runs ->
-        editor.setCursorBufferPosition [0, 10]
-        atom.commands.dispatch editorView, 'kill-ring:kill-line'
         expect(editor.getText()).toEqual('0123456789abcdefghij\nABCDEFGHIJ\n9876543210\nzyxwvutsrq\nZYXWVUTSRQ\n')
 
     it "should do nothing when the cursor is on end-of-file", ->
-      atom.commands.dispatch editorView, 'kill-ring:yank'
-      waitsForPromise ->
-        activationPromise
+      editor.setCursorBufferPosition [6, 0]
+      atom.commands.dispatch editorView, 'kill-ring:kill-line'
+      waitsForPromise -> activationPromise
       runs ->
-        editor.setCursorBufferPosition [6, 0]
-        atom.commands.dispatch editorView, 'kill-ring:kill-line'
         expect(editor.getText()).toEqual('0123456789\nabcdefghij\nABCDEFGHIJ\n9876543210\nzyxwvutsrq\nZYXWVUTSRQ\n')
