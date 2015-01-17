@@ -18,6 +18,7 @@ module.exports = KillRing =
     # Register command that toggles this view
     @subscriptions.add atom.commands.add 'atom-text-editor', 'kill-ring:set-mark': (event) => @setMark(event)
     @subscriptions.add atom.commands.add 'atom-text-editor', 'kill-ring:kill-region': (event) => @killRegion(event)
+    @subscriptions.add atom.commands.add 'atom-text-editor', 'kill-ring:copy-region-as-kill': (event) => @copyRegionAsKill(event)
     @subscriptions.add atom.commands.add 'atom-text-editor', 'kill-ring:kill-selection': (event) => @killSelection(event)
     @subscriptions.add atom.commands.add 'atom-text-editor', 'kill-ring:kill-line': (event) => @killLine(event)
     @subscriptions.add atom.commands.add 'atom-text-editor', 'kill-ring:yank': (event) => @yank(event)
@@ -47,6 +48,13 @@ module.exports = KillRing =
     range = @_markedRange editor
     return unless range?
     @_killRange editor, range, false
+
+  copyRegionAsKill: (event) ->
+    editor = event.target.model
+    return unless editor?
+    range = @_markedRange editor
+    return unless range?
+    @_killRange editor, range, true
 
   killSelection: (event) ->
     editor = event.target.model
