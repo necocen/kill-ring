@@ -30,13 +30,14 @@ module.exports = class RingBuffer
         _current -= 1
         return _buffer[_current]
 
-    normalize = ->
+    @normalize = ->
       if (_buffer.length is _size) and (_current > 0)
         newBuffer = _buffer[(_current + 1)..].concat(_buffer[0.._current])
         _buffer = newBuffer
 
     @getSize = -> _size
     @setSize = (newSize) ->
-      normalize()
+      @normalize()
+      _size = newSize
       if newSize < _buffer.length
         _buffer = _buffer[(_buffer.length - newSize)..]
