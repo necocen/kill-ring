@@ -23,6 +23,7 @@ module.exports = KillRing =
     @subscriptions.add atom.commands.add 'atom-text-editor', 'kill-ring:kill-line': (event) => @killLine(event)
     @subscriptions.add atom.commands.add 'atom-text-editor', 'kill-ring:yank': (event) => @yank(event)
     @subscriptions.add atom.commands.add 'atom-text-editor', 'kill-ring:yank-pop': (event) => @yankPop(event)
+    @subscriptions.add atom.commands.add 'atom-text-editor', 'kill-ring:exchange-point-and-mark': (event) => @exchangePointAndMark(event)
 
   deactivate: ->
     @subscriptions.dispose()
@@ -93,6 +94,18 @@ module.exports = KillRing =
     subscription = editor.onDidChangeCursorPosition (event) =>
       @lastYankRange = null
       subscription.dispose()
+
+  exchangePointAndMark: (event) ->
+    editor = event.target.model
+    return unless editor?
+    cursor = editor.getLastCursor()
+    return nil unless cursor?
+    marker = @markers[editor.id]
+    return nil unless marker?
+    return nil unless marker.isValid()
+    markerPosition = marker.getHeadBufferPosition()
+    marker.setHeadBufferPosition cursor.getBufferPosition()
+    cursor.setBufferPosition markerPosition, {autoscroll: true}
 
   _killRange: (editor, range, copy) ->
     editor.transact =>

@@ -14,3 +14,4 @@
   'ctrl-k': 'kill-ring:kill-line'
   'ctrl-y': 'kill-ring:yank'
   'alt-y': 'kill-ring:yank-pop'
+  'ctrl-x ctrl-x': 'kill-ring:exchange-point-and-mark'
