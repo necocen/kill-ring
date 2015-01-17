@@ -44,20 +44,8 @@ module.exports = KillRing =
   killRegion: (event) ->
     editor = event.target.model
     return unless editor?
-    cursor = editor.getLastCursor()
-    return unless cursor?
-    marker = @markers[editor.id]
-    return unless marker?
-    return unless marker.isValid()
-
-    cursorPosition = cursor.getBufferPosition()
-    markerPosition = marker.getHeadBufferPosition()
-    return if cursorPosition.isEqual(markerPosition)
-    range = null
-    if cursorPosition.isLessThan(markerPosition)
-      range = new Range(cursorPosition, markerPosition)
-    else
-      range = new Range(markerPosition, cursorPosition)
+    range = @_markedRange editor
+    return unless range?
     @_killRange editor, range, false
 
   killSelection: (event) ->
@@ -104,3 +92,12 @@ module.exports = KillRing =
       return if text.length is 0
       @buffer.push(text)
       editor.buffer.delete(range) if copy is false
+
+  _markedRange: (editor) ->
+    return nil unless editor?
+    cursor = editor.getLastCursor()
+    return nil unless cursor?
+    marker = @markers[editor.id]
+    return nil unless marker?
+    return nil unless marker.isValid()
+    return new Range(cursor.getBufferPosition(), marker.getHeadBufferPosition())
