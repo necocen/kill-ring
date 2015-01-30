@@ -1,7 +1,7 @@
 {
   "name": "kill-ring",
   "main": "./lib/kill-ring",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "An emacs-like kill ring.",
   "activationCommands": {
     "atom-text-editor": [

@@ -16,13 +16,13 @@ module.exports = class RingBuffer
 
     @peek = ->
       if _current < 0
-        return nil
+        return null
       else
         return _buffer[_current]
 
     @peekback = ->
       if _current < 0
-        return nil
+        return null
       else if _current is 0
         _current = _buffer.length - 1
         return _buffer[_current]

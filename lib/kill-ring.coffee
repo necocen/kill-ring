@@ -112,10 +112,10 @@ module.exports = KillRing =
     editor = event.target.model
     return unless editor?
     cursor = editor.getLastCursor()
-    return nil unless cursor?
+    return unless cursor?
     marker = @markers[editor.id]
-    return nil unless marker?
-    return nil unless marker.isValid()
+    return unless marker?
+    return unless marker.isValid()
     markerPosition = marker.getHeadBufferPosition()
     marker.setHeadBufferPosition cursor.getBufferPosition()
     cursor.setBufferPosition markerPosition, {autoscroll: true}
@@ -128,10 +128,10 @@ module.exports = KillRing =
       editor.buffer.delete(range) if copy is false
 
   _markedRange: (editor) ->
-    return nil unless editor?
+    return null unless editor?
     cursor = editor.getLastCursor()
-    return nil unless cursor?
+    return null unless cursor?
     marker = @markers[editor.id]
-    return nil unless marker?
-    return nil unless marker.isValid()
+    return null unless marker?
+    return null unless marker.isValid()
     return new Range(cursor.getBufferPosition(), marker.getHeadBufferPosition())
